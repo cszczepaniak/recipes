@@ -1,0 +1,108 @@
+package templates
+
+import (
+	"fmt"
+	"recipes/internal/store"
+)
+
+templ ListPage(recipes []store.Recipe) {
+	@Layout("All recipes", ListContent(recipes))
+}
+
+templ ListContent(recipes []store.Recipe) {
+	<h1 class="mb-6 text-2xl font-bold text-stone-800">All recipes</h1>
+	if len(recipes) == 0 {
+		<p class="text-stone-500">No recipes yet. <a href="/recipes/new" class="text-amber-600 hover:underline">Create one</a>.</p>
+	} else {
+		<ul class="space-y-2">
+			for _, r := range recipes {
+				<li>
+					<a href={ "/recipes/" + fmt.Sprintf("%d", r.ID) } class="block rounded-lg border border-stone-200 bg-white px-4 py-3 shadow-sm hover:border-amber-300 hover:bg-amber-50/50">
+						<span class="font-medium text-stone-800">{ r.Title }</span>
+					</a>
+				</li>
+			}
+		</ul>
+	}
+}
+
+templ ShowPage(recipe *store.Recipe) {
+	@Layout(recipe.Title, ShowContent(recipe))
+}
+
+templ ShowContent(recipe *store.Recipe) {
+	<article>
+		<h1 class="mb-6 text-2xl font-bold text-stone-800">{ recipe.Title }</h1>
+		<section class="mb-8">
+			<h2 class="mb-2 text-sm font-semibold uppercase tracking-wide text-stone-500">Ingredients</h2>
+			<ul class="list-inside list-disc space-y-1 text-stone-700">
+				for _, ing := range recipe.Ingredients {
+					<li>{ ing }</li>
+				}
+			</ul>
+		</section>
+		<section>
+			<h2 class="mb-2 text-sm font-semibold uppercase tracking-wide text-stone-500">Steps</h2>
+			<ol class="list-inside list-decimal space-y-2 text-stone-700">
+				for _, step := range recipe.Steps {
+					<li>{ step }</li>
+				}
+			</ol>
+		</section>
+	</article>
+}
+
+templ NewRecipePage() {
+	@Layout("New recipe", NewRecipeForm())
+}
+
+templ NewRecipeForm() {
+	<h1 class="mb-6 text-2xl font-bold text-stone-800">New recipe</h1>
+	<form
+		action="/recipes"
+		method="POST"
+		data-on:submit="@post('/recipes', {contentType: 'form'})"
+		class="space-y-6"
+	>
+		<div>
+			<label for="title" class="mb-1 block text-sm font-medium text-stone-700">Title</label>
+			<input
+				type="text"
+				id="title"
+				name="title"
+				required
+				class="w-full rounded-md border border-stone-300 px-3 py-2 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+				placeholder="e.g. Chocolate chip cookies"
+			/>
+		</div>
+		<div>
+			<label for="ingredients" class="mb-1 block text-sm font-medium text-stone-700">Ingredients (one per line)</label>
+			<textarea
+				id="ingredients"
+				name="ingredients"
+				rows="8"
+				class="w-full rounded-md border border-stone-300 px-3 py-2 font-mono text-sm focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+				placeholder="2 cups flour&#10;1 cup sugar&#10;..."
+			></textarea>
+		</div>
+		<div>
+			<label for="steps" class="mb-1 block text-sm font-medium text-stone-700">Steps (one per line)</label>
+			<textarea
+				id="steps"
+				name="steps"
+				rows="10"
+				class="w-full rounded-md border border-stone-300 px-3 py-2 font-mono text-sm focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+				placeholder="Preheat oven to 350°F.&#10;Mix dry ingredients.&#10;..."
+			></textarea>
+		</div>
+		<div class="flex gap-3">
+			<button
+				type="submit"
+				class="rounded-md bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700"
+			>
+				Create recipe
+			</button>
+			<a href="/" class="rounded-md border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100">Cancel</a>
+		</div>
+	</form>
+}
