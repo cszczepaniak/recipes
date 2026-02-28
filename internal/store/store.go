@@ -45,6 +45,27 @@ func migrate(db *sql.DB) error {
 			content TEXT NOT NULL,
 			PRIMARY KEY (recipe_id, ord)
 		);
+		CREATE TABLE IF NOT EXISTS tags (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			name TEXT NOT NULL UNIQUE
+		);
+		CREATE TABLE IF NOT EXISTS recipe_tags (
+			recipe_id INTEGER NOT NULL REFERENCES recipes(id) ON DELETE CASCADE,
+			tag_id INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+			PRIMARY KEY (recipe_id, tag_id)
+		);
+		CREATE TABLE IF NOT EXISTS ingredients (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			name TEXT NOT NULL UNIQUE
+		);
 	`)
-	return err
+	if err != nil {
+		return err
+	}
+	// Populate ingredients from existing recipe_ingredients for search suggestions
+	_, _ = db.Exec(`
+		INSERT OR IGNORE INTO ingredients (name)
+		SELECT DISTINCT TRIM(line) FROM recipe_ingredients WHERE TRIM(line) != ''
+	`)
+	return nil
 }

@@ -34,3 +34,6 @@ recipes.db
 # Editor/IDE
 # .idea/
 # .vscode/
+
+# Binary
+recipes

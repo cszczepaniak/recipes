@@ -17,7 +17,7 @@ func TestCreateAndGet(t *testing.T) {
 	defer db.Close()
 	ctx := context.Background()
 
-	id, err := db.Create(ctx, "Test Recipe", []string{"1 cup flour", "2 eggs"}, []string{"Mix", "Bake at 350°F"})
+	id, err := db.Create(ctx, "Test Recipe", []string{"1 cup flour", "2 eggs"}, []string{"Mix", "Bake at 350°F"}, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -53,10 +53,10 @@ func TestList(t *testing.T) {
 	defer db.Close()
 	ctx := context.Background()
 
-	_, _ = db.Create(ctx, "First", nil, nil)
-	_, _ = db.Create(ctx, "Second", nil, nil)
+	_, _ = db.Create(ctx, "First", nil, nil, nil)
+	_, _ = db.Create(ctx, "Second", nil, nil, nil)
 
-	list, err := db.List(ctx)
+	list, err := db.List(ctx, "", "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -99,5 +99,57 @@ func TestOpenCreatesDB(t *testing.T) {
 	}
 	if _, err := os.Stat(dbPath); os.IsNotExist(err) {
 		t.Error("database file was not created")
+	}
+}
+
+func TestCreateWithTags(t *testing.T) {
+	dir := t.TempDir()
+	dbPath := filepath.Join(dir, "test.db")
+	db, err := Open(dbPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	ctx := context.Background()
+
+	id, err := db.Create(ctx, "Tagged Recipe", []string{"flour"}, []string{"Mix"}, []string{"quick", "beef"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	tags, err := db.GetRecipeTags(ctx, id)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(tags) != 2 {
+		t.Fatalf("expected 2 tags, got %d: %v", len(tags), tags)
+	}
+	list, err := db.List(ctx, "quick", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(list) != 1 || list[0].Title != "Tagged Recipe" {
+		t.Errorf("list by tag: got %v", list)
+	}
+}
+
+func TestListByIngredient(t *testing.T) {
+	dir := t.TempDir()
+	dbPath := filepath.Join(dir, "test.db")
+	db, err := Open(dbPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	ctx := context.Background()
+
+	_, _ = db.Create(ctx, "With flour", []string{"2 cups flour", "water"}, []string{"Mix"}, nil)
+	_, _ = db.Create(ctx, "No flour", []string{"sugar", "eggs"}, []string{"Mix"}, nil)
+
+	list, err := db.List(ctx, "", "flour")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(list) != 1 || list[0].Title != "With flour" {
+		t.Errorf("list by ingredient: got %v", list)
 	}
 }

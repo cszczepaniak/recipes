@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"os"
@@ -29,7 +30,9 @@ func main() {
 		// Pages
 	mux.HandleFunc("GET /", listHandler(db))
 	mux.HandleFunc("GET /recipes", listHandler(db))
-	mux.HandleFunc("GET /recipes/new", newRecipeFormHandler())
+	mux.HandleFunc("GET /recipes/new", newRecipeFormHandler(db))
+	mux.HandleFunc("GET /api/tags", tagsAPIHandler(db))
+	mux.HandleFunc("GET /api/ingredients", ingredientsAPIHandler(db))
 	mux.HandleFunc("GET /recipes/{id}", showRecipeHandler(db))
 	mux.HandleFunc("POST /recipes", createRecipeHandler(db))
 
@@ -43,12 +46,15 @@ func main() {
 
 func listHandler(db *store.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		recipes, err := db.List(r.Context())
+		tagFilter := strings.TrimSpace(r.URL.Query().Get("tag"))
+		ingredientSearch := strings.TrimSpace(r.URL.Query().Get("ingredient"))
+		recipes, err := db.List(r.Context(), tagFilter, ingredientSearch)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		templates.ListPage(recipes).Render(r.Context(), w)
+		tags, _ := db.ListTags(r.Context())
+		templates.ListPage(recipes, tags, tagFilter, ingredientSearch).Render(r.Context(), w)
 	}
 }
 
@@ -73,9 +79,11 @@ func showRecipeHandler(db *store.DB) http.HandlerFunc {
 	}
 }
 
-func newRecipeFormHandler() http.HandlerFunc {
+func newRecipeFormHandler(db *store.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		templates.NewRecipePage().Render(r.Context(), w)
+		tags, _ := db.ListTags(r.Context())
+		ingredients, _ := db.ListIngredientNames(r.Context())
+		templates.NewRecipePage(tags, ingredients).Render(r.Context(), w)
 	}
 }
 
@@ -96,8 +104,9 @@ func createRecipeHandler(db *store.DB) http.HandlerFunc {
 		}
 		ingredients := parseLines(r.FormValue("ingredients"))
 		steps := parseLines(r.FormValue("steps"))
+		tagNames := parseTagList(r.FormValue("tags"))
 
-		id, err := db.Create(r.Context(), title, ingredients, steps)
+		id, err := db.Create(r.Context(), title, ingredients, steps, tagNames)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -123,4 +132,42 @@ func parseLines(s string) []string {
 		}
 	}
 	return out
+}
+
+func parseTagList(s string) []string {
+	parts := strings.Split(s, ",")
+	var out []string
+	for _, p := range parts {
+		p = strings.TrimSpace(p)
+		if p != "" {
+			out = append(out, p)
+		}
+	}
+	return out
+}
+
+func tagsAPIHandler(db *store.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		tags, err := db.ListTags(r.Context())
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		enc := json.NewEncoder(w)
+		_ = enc.Encode(tags)
+	}
+}
+
+func ingredientsAPIHandler(db *store.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		names, err := db.ListIngredientNames(r.Context())
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		enc := json.NewEncoder(w)
+		_ = enc.Encode(names)
+	}
 }
