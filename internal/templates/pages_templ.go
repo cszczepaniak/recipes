@@ -482,7 +482,7 @@ func NewRecipeForm(tags []string, ingredientNames []string) templ.Component {
 			templ_7745c5c3_Var23 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "<h1 class=\"mb-6 text-2xl font-bold text-stone-800\">New recipe</h1><form action=\"/recipes\" method=\"POST\" data-on:submit=\"@post('/recipes', {contentType: 'form'})\" class=\"space-y-6\" data-signals=\"{ tags: '', ingredients: '', ingredientQuery: '' }\"><div><label for=\"title\" class=\"mb-1 block text-sm font-medium text-stone-700\">Title</label> <input type=\"text\" id=\"title\" name=\"title\" required class=\"w-full rounded-md border border-stone-300 px-3 py-2 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500\" placeholder=\"e.g. Chocolate chip cookies\"></div><div class=\"relative\" data-signals:tags=\"$tags\"><label for=\"tags\" class=\"mb-1 block text-sm font-medium text-stone-700\">Tags (comma-separated; type for suggestions or add new)</label> <input type=\"text\" id=\"tags\" name=\"tags\" data-bind:tags data-on:input__debounce.200ms=\"@get('/suggestions/tags')\" class=\"w-full rounded-md border border-stone-300 px-3 py-2 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500\" placeholder=\"e.g. quick, beef, braise\"><div id=\"tag-suggestions\"></div></div><div class=\"relative\" data-signals:ingredientQuery=\"$ingredientQuery\"><label for=\"ingredients\" class=\"mb-1 block text-sm font-medium text-stone-700\">Ingredients (one per line; type for suggestions)</label> <textarea id=\"ingredients\" name=\"ingredients\" data-bind:ingredients class=\"w-full rounded-md border border-stone-300 px-3 py-2 font-mono text-sm focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500\" rows=\"8\" placeholder=\"2 cups flour&#10;1 cup sugar&#10;...\"></textarea> <input type=\"text\" class=\"mt-1 w-full rounded-md border border-stone-200 px-2 py-1 text-sm\" placeholder=\"Type to search ingredients...\" data-bind:ingredientQuery data-on:input__debounce.200ms=\"@get('/suggestions/ingredients')\" aria-label=\"Search ingredients to add\"><div id=\"ingredient-suggestions\"></div></div><div><label for=\"steps\" class=\"mb-1 block text-sm font-medium text-stone-700\">Steps (one per line)</label> <textarea id=\"steps\" name=\"steps\" rows=\"10\" class=\"w-full rounded-md border border-stone-300 px-3 py-2 font-mono text-sm focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500\" placeholder=\"Preheat oven to 350°F.&#10;Mix dry ingredients.&#10;...\"></textarea></div><div class=\"flex gap-3\"><button type=\"submit\" class=\"rounded-md bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700\">Create recipe</button> <a href=\"/\" class=\"rounded-md border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100\">Cancel</a></div></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "<h1 class=\"mb-6 text-2xl font-bold text-stone-800\">New recipe</h1><form action=\"/recipes\" method=\"POST\" data-on:submit=\"@post('/recipes', {contentType: 'form'})\" class=\"space-y-6\" data-signals=\"{ tags: '', ingredients: '', ingredientQuery: '', showTagSuggestions: false, showIngredientSuggestions: false }\"><div><label for=\"title\" class=\"mb-1 block text-sm font-medium text-stone-700\">Title</label> <input type=\"text\" id=\"title\" name=\"title\" required class=\"w-full rounded-md border border-stone-300 px-3 py-2 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500\" placeholder=\"e.g. Chocolate chip cookies\"></div><div class=\"relative\" data-signals:tags=\"$tags\"><label for=\"tags\" class=\"mb-1 block text-sm font-medium text-stone-700\">Tags (comma-separated; type for suggestions or add new)</label> <input type=\"text\" id=\"tags\" name=\"tags\" data-bind:tags data-on:focus=\"$showTagSuggestions = true\" data-on:blur__delay.150ms=\"$showTagSuggestions = false\" data-on:input__debounce.200ms=\"@get('/suggestions/tags')\" class=\"w-full rounded-md border border-stone-300 px-3 py-2 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500\" placeholder=\"e.g. quick, beef, braise\"><div data-show=\"$showTagSuggestions\"><div id=\"tag-suggestions\"></div></div></div><div class=\"relative\" data-signals:ingredientQuery=\"$ingredientQuery\"><label for=\"ingredients\" class=\"mb-1 block text-sm font-medium text-stone-700\">Ingredients (one per line; type for suggestions)</label> <textarea id=\"ingredients\" name=\"ingredients\" data-bind:ingredients class=\"w-full rounded-md border border-stone-300 px-3 py-2 font-mono text-sm focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500\" rows=\"8\" placeholder=\"2 cups flour&#10;1 cup sugar&#10;...\"></textarea> <input type=\"text\" class=\"mt-1 w-full rounded-md border border-stone-200 px-2 py-1 text-sm\" placeholder=\"Type to search ingredients...\" data-bind:ingredientQuery data-on:focus=\"$showIngredientSuggestions = true\" data-on:blur__delay.150ms=\"$showIngredientSuggestions = false\" data-on:input__debounce.200ms=\"@get('/suggestions/ingredients')\" aria-label=\"Search ingredients to add\"><div data-show=\"$showIngredientSuggestions\"><div id=\"ingredient-suggestions\"></div></div></div><div><label for=\"steps\" class=\"mb-1 block text-sm font-medium text-stone-700\">Steps (one per line)</label> <textarea id=\"steps\" name=\"steps\" rows=\"10\" class=\"w-full rounded-md border border-stone-300 px-3 py-2 font-mono text-sm focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500\" placeholder=\"Preheat oven to 350°F.&#10;Mix dry ingredients.&#10;...\"></textarea></div><div class=\"flex gap-3\"><button type=\"submit\" class=\"rounded-md bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700\">Create recipe</button> <a href=\"/\" class=\"rounded-md border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100\">Cancel</a></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -547,7 +547,7 @@ func EditRecipeForm(recipe *store.Recipe, tags []string, ingredientNames []strin
 		var templ_7745c5c3_Var26 templ.SafeURL
 		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinURLErrs("/recipes/" + fmt.Sprintf("%d", recipe.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/pages.templ`, Line: 187, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/pages.templ`, Line: 195, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 		if templ_7745c5c3_Err != nil {
@@ -560,20 +560,20 @@ func EditRecipeForm(recipe *store.Recipe, tags []string, ingredientNames []strin
 		var templ_7745c5c3_Var27 string
 		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs("@post('/recipes/" + fmt.Sprintf("%d", recipe.ID) + "', {contentType: 'form'})")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/pages.templ`, Line: 189, Col: 98}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/pages.templ`, Line: 197, Col: 98}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "\" class=\"space-y-6\" data-signals:ingredientQuery=\"''\"><div><label for=\"edit-title\" class=\"mb-1 block text-sm font-medium text-stone-700\">Title</label> <input type=\"text\" id=\"edit-title\" name=\"title\" required value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "\" class=\"space-y-6\" data-signals=\"{ showTagSuggestions: false, showIngredientSuggestions: false }\" data-signals:ingredientQuery=\"''\"><div><label for=\"edit-title\" class=\"mb-1 block text-sm font-medium text-stone-700\">Title</label> <input type=\"text\" id=\"edit-title\" name=\"title\" required value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var28 string
 		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(recipe.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/pages.templ`, Line: 200, Col: 24}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/pages.templ`, Line: 209, Col: 24}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 		if templ_7745c5c3_Err != nil {
@@ -586,33 +586,33 @@ func EditRecipeForm(recipe *store.Recipe, tags []string, ingredientNames []strin
 		var templ_7745c5c3_Var29 string
 		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(strings.Join(recipe.Tags, ", "))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/pages.templ`, Line: 210, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/pages.templ`, Line: 219, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "\" data-bind:tags data-on:input__debounce.200ms=\"@get('/suggestions/tags')\" class=\"w-full rounded-md border border-stone-300 px-3 py-2 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500\"><div id=\"tag-suggestions\"></div></div><div class=\"relative\" data-signals:ingredientQuery=\"$ingredientQuery\"><label for=\"edit-ingredients\" class=\"mb-1 block text-sm font-medium text-stone-700\">Ingredients (one per line)</label> <textarea id=\"edit-ingredients\" name=\"ingredients\" data-bind:ingredients class=\"w-full rounded-md border border-stone-300 px-3 py-2 font-mono text-sm focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500\" rows=\"8\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "\" data-bind:tags data-on:focus=\"$showTagSuggestions = true\" data-on:blur__delay.150ms=\"$showTagSuggestions = false\" data-on:input__debounce.200ms=\"@get('/suggestions/tags')\" class=\"w-full rounded-md border border-stone-300 px-3 py-2 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500\"><div data-show=\"$showTagSuggestions\"><div id=\"tag-suggestions\"></div></div></div><div class=\"relative\" data-signals:ingredientQuery=\"$ingredientQuery\"><label for=\"edit-ingredients\" class=\"mb-1 block text-sm font-medium text-stone-700\">Ingredients (one per line)</label> <textarea id=\"edit-ingredients\" name=\"ingredients\" data-bind:ingredients class=\"w-full rounded-md border border-stone-300 px-3 py-2 font-mono text-sm focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500\" rows=\"8\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var30 string
 		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(strings.Join(recipe.Ingredients, "\n"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/pages.templ`, Line: 225, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/pages.templ`, Line: 238, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "</textarea> <input type=\"text\" class=\"mt-1 w-full rounded-md border border-stone-200 px-2 py-1 text-sm\" placeholder=\"Type to search ingredients...\" data-bind:ingredientQuery data-on:input__debounce.200ms=\"@get('/suggestions/ingredients')\" aria-label=\"Search ingredients to add\"><div id=\"ingredient-suggestions\"></div></div><div><label for=\"edit-steps\" class=\"mb-1 block text-sm font-medium text-stone-700\">Steps (one per line)</label> <textarea id=\"edit-steps\" name=\"steps\" class=\"w-full rounded-md border border-stone-300 px-3 py-2 font-mono text-sm focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500\" rows=\"10\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "</textarea> <input type=\"text\" class=\"mt-1 w-full rounded-md border border-stone-200 px-2 py-1 text-sm\" placeholder=\"Type to search ingredients...\" data-bind:ingredientQuery data-on:focus=\"$showIngredientSuggestions = true\" data-on:blur__delay.150ms=\"$showIngredientSuggestions = false\" data-on:input__debounce.200ms=\"@get('/suggestions/ingredients')\" aria-label=\"Search ingredients to add\"><div data-show=\"$showIngredientSuggestions\"><div id=\"ingredient-suggestions\"></div></div></div><div><label for=\"edit-steps\" class=\"mb-1 block text-sm font-medium text-stone-700\">Steps (one per line)</label> <textarea id=\"edit-steps\" name=\"steps\" class=\"w-full rounded-md border border-stone-300 px-3 py-2 font-mono text-sm focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500\" rows=\"10\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var31 string
 		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(strings.Join(recipe.Steps, "\n"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/pages.templ`, Line: 243, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/pages.templ`, Line: 260, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 		if templ_7745c5c3_Err != nil {
@@ -625,7 +625,7 @@ func EditRecipeForm(recipe *store.Recipe, tags []string, ingredientNames []strin
 		var templ_7745c5c3_Var32 templ.SafeURL
 		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinURLErrs("/recipes/" + fmt.Sprintf("%d", recipe.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/pages.templ`, Line: 247, Col: 55}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/pages.templ`, Line: 264, Col: 55}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 		if templ_7745c5c3_Err != nil {
@@ -640,7 +640,8 @@ func EditRecipeForm(recipe *store.Recipe, tags []string, ingredientNames []strin
 }
 
 // TagSuggestionsFragment renders HTML for tag autocomplete (patched into #tag-suggestions).
-func TagSuggestionsFragment(tags []string) templ.Component {
+// query is the current search text (last segment of the tags input); when non-empty, "Add tag 'query'" is shown first.
+func TagSuggestionsFragment(tags []string, query string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -661,58 +662,75 @@ func TagSuggestionsFragment(tags []string) templ.Component {
 			templ_7745c5c3_Var33 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "<div id=\"tag-suggestions\" class=\"absolute z-10 mt-1 max-h-40 w-full overflow-auto rounded-md border border-stone-200 bg-white shadow-lg\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "<div id=\"tag-suggestions\" class=\"absolute z-10 mt-1 max-h-40 w-full overflow-auto rounded-md border border-stone-200 bg-white shadow-lg\"><ul class=\"py-1\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if len(tags) == 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "<p class=\"px-3 py-2 text-sm text-stone-500\">No matching tags. Type to add a new one.</p>")
+		if query != "" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "<li><button type=\"button\" class=\"w-full px-3 py-1.5 text-left text-sm font-medium text-amber-700 hover:bg-amber-50\" data-on:click=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "<ul class=\"py-1\">")
+			var templ_7745c5c3_Var34 string
+			templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs("$showTagSuggestions = false; $tags = (() => { var p = ($tags || '').split(',').map(s => s.trim()).filter(Boolean); if (p.length > 1) { p.pop(); return p.join(', ') + ', " + EscapeJSString(query) + "'; } return '" + EscapeJSString(query) + "'; })()")
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/pages.templ`, Line: 279, Col: 271}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			for _, tag := range tags {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "<li><button type=\"button\" class=\"w-full px-3 py-1.5 text-left text-sm hover:bg-amber-50\" data-on:click=\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var34 string
-				templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs("$tags = ($tags ? $tags.trimEnd() + ', ' : '') + '" + EscapeJSString(tag) + "'")
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/pages.templ`, Line: 264, Col: 102}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var35 string
-				templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(tag)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/pages.templ`, Line: 266, Col: 12}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "</button></li>")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "\">Add tag '")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "</ul>")
+			var templ_7745c5c3_Var35 string
+			templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(query)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/pages.templ`, Line: 281, Col: 22}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "'</button></li>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "</div>")
+		for _, tag := range tags {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "<li><button type=\"button\" class=\"w-full px-3 py-1.5 text-left text-sm hover:bg-amber-50\" data-on:click=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var36 string
+			templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs("$showTagSuggestions = false; $tags = (() => { var p = ($tags || '').split(',').map(s => s.trim()).filter(Boolean); if (p.length > 1) { p.pop(); return p.join(', ') + ', " + EscapeJSString(tag) + "'; } return '" + EscapeJSString(tag) + "'; })()")
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/pages.templ`, Line: 290, Col: 267}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var37 string
+			templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(tag)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/pages.templ`, Line: 292, Col: 11}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "</button></li>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "</ul></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -737,9 +755,9 @@ func IngredientSuggestionsFragment(ingredients []string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var36 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var36 == nil {
-			templ_7745c5c3_Var36 = templ.NopComponent
+		templ_7745c5c3_Var38 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var38 == nil {
+			templ_7745c5c3_Var38 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "<div id=\"ingredient-suggestions\" class=\"absolute z-10 mt-1 max-h-40 w-full overflow-auto rounded-md border border-stone-200 bg-white shadow-lg\">")
@@ -761,12 +779,12 @@ func IngredientSuggestionsFragment(ingredients []string) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var37 string
-				templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs("$ingredients = ($ingredients || '') + '" + EscapeJSString(ing) + "' + '\\n'")
+				var templ_7745c5c3_Var39 string
+				templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs("$showIngredientSuggestions = false; $ingredients = ($ingredients || '') + '" + EscapeJSString(ing) + "' + '\\n'")
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/pages.templ`, Line: 287, Col: 100}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/pages.templ`, Line: 312, Col: 136}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -774,12 +792,12 @@ func IngredientSuggestionsFragment(ingredients []string) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var38 string
-				templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(ing)
+				var templ_7745c5c3_Var40 string
+				templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinStringErrs(ing)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/pages.templ`, Line: 289, Col: 12}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/pages.templ`, Line: 314, Col: 12}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

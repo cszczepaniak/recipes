@@ -28,7 +28,7 @@ func main() {
 
 	mux := http.NewServeMux()
 
-		// Pages
+	// Pages
 	mux.HandleFunc("GET /", listHandler(db))
 	mux.HandleFunc("GET /recipes", listHandler(db))
 	mux.HandleFunc("GET /recipes/new", newRecipeFormHandler(db))
@@ -140,6 +140,18 @@ func parseLines(s string) []string {
 	return out
 }
 
+// lastTagSegment returns the last comma-separated segment of the tags input (the current search).
+func lastTagSegment(s string) string {
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return ""
+	}
+	if i := strings.LastIndex(s, ","); i >= 0 {
+		return strings.TrimSpace(s[i+1:])
+	}
+	return s
+}
+
 func parseTagList(s string) []string {
 	parts := strings.Split(s, ",")
 	var out []string
@@ -178,13 +190,21 @@ func ingredientsAPIHandler(db *store.DB) http.HandlerFunc {
 	}
 }
 
+// suggestionSignals is the shape of signals sent by the client for suggestion GET requests (query param "datastar" as JSON).
+type suggestionSignals struct {
+	Tags            string `json:"tags"`
+	IngredientQuery string `json:"ingredientQuery"`
+}
+
 // tagSuggestionsHandler returns SSE patch-elements for tag autocomplete (Datastar patches into #tag-suggestions).
 func tagSuggestionsHandler(db *store.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		q := r.URL.Query().Get("tags")
-		tags, _ := db.ListTagsMatching(r.Context(), q)
+		var sigs suggestionSignals
+		_ = datastar.ReadSignals(r, &sigs)
+		query := lastTagSegment(sigs.Tags)
+		tags, _ := db.ListTagsMatching(r.Context(), sigs.Tags)
 		var buf bytes.Buffer
-		_ = templates.TagSuggestionsFragment(tags).Render(r.Context(), &buf)
+		_ = templates.TagSuggestionsFragment(tags, query).Render(r.Context(), &buf)
 		sse := datastar.NewSSE(w, r)
 		_ = sse.PatchElements(buf.String(), datastar.WithSelector("#tag-suggestions"), datastar.WithModeReplace())
 	}
@@ -193,8 +213,9 @@ func tagSuggestionsHandler(db *store.DB) http.HandlerFunc {
 // ingredientSuggestionsHandler returns SSE patch-elements for ingredient autocomplete (Datastar patches into #ingredient-suggestions).
 func ingredientSuggestionsHandler(db *store.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		q := r.URL.Query().Get("ingredientQuery")
-		names, _ := db.ListIngredientNamesMatching(r.Context(), q)
+		var sigs suggestionSignals
+		_ = datastar.ReadSignals(r, &sigs)
+		names, _ := db.ListIngredientNamesMatching(r.Context(), sigs.IngredientQuery)
 		var buf bytes.Buffer
 		_ = templates.IngredientSuggestionsFragment(names).Render(r.Context(), &buf)
 		sse := datastar.NewSSE(w, r)
