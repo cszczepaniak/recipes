@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -31,10 +32,15 @@ func main() {
 	mux.HandleFunc("GET /", listHandler(db))
 	mux.HandleFunc("GET /recipes", listHandler(db))
 	mux.HandleFunc("GET /recipes/new", newRecipeFormHandler(db))
+	mux.HandleFunc("GET /suggestions/tags", tagSuggestionsHandler(db))
+	mux.HandleFunc("GET /suggestions/ingredients", ingredientSuggestionsHandler(db))
 	mux.HandleFunc("GET /api/tags", tagsAPIHandler(db))
 	mux.HandleFunc("GET /api/ingredients", ingredientsAPIHandler(db))
 	mux.HandleFunc("GET /recipes/{id}", showRecipeHandler(db))
+	mux.HandleFunc("GET /recipes/{id}/edit", editRecipeFormHandler(db))
 	mux.HandleFunc("POST /recipes", createRecipeHandler(db))
+	mux.HandleFunc("POST /recipes/{id}", updateRecipeHandler(db))
+	mux.HandleFunc("DELETE /recipes/{id}", deleteRecipeHandler(db))
 
 	addr := ":8080"
 	if p := os.Getenv("PORT"); p != "" {
@@ -169,5 +175,106 @@ func ingredientsAPIHandler(db *store.DB) http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 		enc := json.NewEncoder(w)
 		_ = enc.Encode(names)
+	}
+}
+
+// tagSuggestionsHandler returns SSE patch-elements for tag autocomplete (Datastar patches into #tag-suggestions).
+func tagSuggestionsHandler(db *store.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		q := r.URL.Query().Get("tags")
+		tags, _ := db.ListTagsMatching(r.Context(), q)
+		var buf bytes.Buffer
+		_ = templates.TagSuggestionsFragment(tags).Render(r.Context(), &buf)
+		sse := datastar.NewSSE(w, r)
+		_ = sse.PatchElements(buf.String(), datastar.WithSelector("#tag-suggestions"), datastar.WithModeReplace())
+	}
+}
+
+// ingredientSuggestionsHandler returns SSE patch-elements for ingredient autocomplete (Datastar patches into #ingredient-suggestions).
+func ingredientSuggestionsHandler(db *store.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		q := r.URL.Query().Get("ingredientQuery")
+		names, _ := db.ListIngredientNamesMatching(r.Context(), q)
+		var buf bytes.Buffer
+		_ = templates.IngredientSuggestionsFragment(names).Render(r.Context(), &buf)
+		sse := datastar.NewSSE(w, r)
+		_ = sse.PatchElements(buf.String(), datastar.WithSelector("#ingredient-suggestions"), datastar.WithModeReplace())
+	}
+}
+
+func deleteRecipeHandler(db *store.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idStr := r.PathValue("id")
+		id, err := strconv.ParseInt(idStr, 10, 64)
+		if err != nil {
+			http.Error(w, "invalid recipe id", http.StatusBadRequest)
+			return
+		}
+		if err := db.Delete(r.Context(), id); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if strings.Contains(r.Header.Get("Accept"), "text/event-stream") {
+			sse := datastar.NewSSE(w, r)
+			sse.Redirect("/recipes")
+			return
+		}
+		http.Redirect(w, r, "/recipes", http.StatusSeeOther)
+	}
+}
+
+func editRecipeFormHandler(db *store.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idStr := r.PathValue("id")
+		id, err := strconv.ParseInt(idStr, 10, 64)
+		if err != nil {
+			http.Error(w, "invalid recipe id", http.StatusBadRequest)
+			return
+		}
+		recipe, err := db.Get(r.Context(), id)
+		if err != nil || recipe == nil {
+			http.NotFound(w, r)
+			return
+		}
+		tags, _ := db.ListTags(r.Context())
+		ingredients, _ := db.ListIngredientNames(r.Context())
+		templates.EditRecipePage(recipe, tags, ingredients).Render(r.Context(), w)
+	}
+}
+
+func updateRecipeHandler(db *store.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idStr := r.PathValue("id")
+		id, err := strconv.ParseInt(idStr, 10, 64)
+		if err != nil {
+			http.Error(w, "invalid recipe id", http.StatusBadRequest)
+			return
+		}
+		if r.Method != http.MethodPost {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		title := strings.TrimSpace(r.FormValue("title"))
+		if title == "" {
+			http.Error(w, "title required", http.StatusBadRequest)
+			return
+		}
+		ingredients := parseLines(r.FormValue("ingredients"))
+		steps := parseLines(r.FormValue("steps"))
+		tagNames := parseTagList(r.FormValue("tags"))
+		if err := db.Update(r.Context(), id, title, ingredients, steps, tagNames); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if strings.Contains(r.Header.Get("Accept"), "text/event-stream") {
+			sse := datastar.NewSSE(w, r)
+			sse.Redirect("/recipes/" + idStr)
+			return
+		}
+		http.Redirect(w, r, "/recipes/"+idStr, http.StatusSeeOther)
 	}
 }

@@ -211,3 +211,102 @@ func (db *DB) ListIngredientNames(ctx context.Context) ([]string, error) {
 	}
 	return out, rows.Err()
 }
+
+// Delete removes a recipe and its ingredients, steps, and tag links.
+func (db *DB) Delete(ctx context.Context, id int64) error {
+	_, err := db.ExecContext(ctx, `DELETE FROM recipes WHERE id = ?`, id)
+	return err
+}
+
+// Update replaces a recipe's title, ingredients, steps, and tags.
+func (db *DB) Update(ctx context.Context, id int64, title string, ingredients, steps []string, tagNames []string) error {
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	if _, err := tx.ExecContext(ctx, `UPDATE recipes SET title = ? WHERE id = ?`, title, id); err != nil {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx, `DELETE FROM recipe_ingredients WHERE recipe_id = ?`, id); err != nil {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx, `DELETE FROM recipe_steps WHERE recipe_id = ?`, id); err != nil {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx, `DELETE FROM recipe_tags WHERE recipe_id = ?`, id); err != nil {
+		return err
+	}
+	for i, line := range ingredients {
+		if _, err := tx.ExecContext(ctx, `INSERT INTO recipe_ingredients (recipe_id, ord, line) VALUES (?, ?, ?)`, id, i, line); err != nil {
+			return err
+		}
+	}
+	for i, content := range steps {
+		if _, err := tx.ExecContext(ctx, `INSERT INTO recipe_steps (recipe_id, ord, content) VALUES (?, ?, ?)`, id, i, content); err != nil {
+			return err
+		}
+	}
+	for _, name := range tagNames {
+		tagID, err := ensureTagTx(ctx, tx, name)
+		if err != nil {
+			return err
+		}
+		if tagID != 0 {
+			if _, err := tx.ExecContext(ctx, `INSERT OR IGNORE INTO recipe_tags (recipe_id, tag_id) VALUES (?, ?)`, id, tagID); err != nil {
+				return err
+			}
+		}
+	}
+	for _, line := range ingredients {
+		line = strings.TrimSpace(line)
+		if line != "" {
+			_, _ = tx.ExecContext(ctx, `INSERT OR IGNORE INTO ingredients (name) VALUES (?)`, line)
+		}
+	}
+	return tx.Commit()
+}
+
+// ListTagsMatching returns tag names that contain the query (for autocomplete).
+func (db *DB) ListTagsMatching(ctx context.Context, q string) ([]string, error) {
+	q = strings.TrimSpace(strings.ToLower(q))
+	if q == "" {
+		return nil, nil
+	}
+	rows, err := db.QueryContext(ctx, `SELECT name FROM tags WHERE name LIKE ? ORDER BY name LIMIT 10`, "%"+q+"%")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var out []string
+	for rows.Next() {
+		var name string
+		if err := rows.Scan(&name); err != nil {
+			return nil, err
+		}
+		out = append(out, name)
+	}
+	return out, rows.Err()
+}
+
+// ListIngredientNamesMatching returns ingredient names that contain the query (for autocomplete).
+func (db *DB) ListIngredientNamesMatching(ctx context.Context, q string) ([]string, error) {
+	q = strings.TrimSpace(q)
+	if q == "" {
+		return nil, nil
+	}
+	rows, err := db.QueryContext(ctx, `SELECT name FROM ingredients WHERE name LIKE ? ORDER BY name LIMIT 10`, "%"+q+"%")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var out []string
+	for rows.Next() {
+		var name string
+		if err := rows.Scan(&name); err != nil {
+			return nil, err
+		}
+		out = append(out, name)
+	}
+	return out, rows.Err()
+}

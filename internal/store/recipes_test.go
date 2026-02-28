@@ -153,3 +153,48 @@ func TestListByIngredient(t *testing.T) {
 		t.Errorf("list by ingredient: got %v", list)
 	}
 }
+
+func TestDelete(t *testing.T) {
+	dir := t.TempDir()
+	dbPath := filepath.Join(dir, "test.db")
+	db, err := Open(dbPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	ctx := context.Background()
+
+	id, _ := db.Create(ctx, "To delete", nil, nil, nil)
+	err = db.Delete(ctx, id)
+	if err != nil {
+		t.Fatal(err)
+	}
+	recipe, _ := db.Get(ctx, id)
+	if recipe != nil {
+		t.Error("expected nil after delete")
+	}
+}
+
+func TestUpdate(t *testing.T) {
+	dir := t.TempDir()
+	dbPath := filepath.Join(dir, "test.db")
+	db, err := Open(dbPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	ctx := context.Background()
+
+	id, _ := db.Create(ctx, "Original", []string{"a"}, []string{"step1"}, []string{"old"})
+	err = db.Update(ctx, id, "Updated", []string{"b", "c"}, []string{"s1", "s2"}, []string{"new"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	recipe, err := db.Get(ctx, id)
+	if err != nil || recipe == nil {
+		t.Fatal("expected recipe")
+	}
+	if recipe.Title != "Updated" || len(recipe.Ingredients) != 2 || len(recipe.Steps) != 2 || len(recipe.Tags) != 1 {
+		t.Errorf("got %+v", recipe)
+	}
+}
